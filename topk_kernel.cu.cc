@@ -50,7 +50,9 @@ struct Heap{
 	__device__ void clear() { n = 0; }
 	__device__ void build_heap(const int start_index){
 			int index = start_index;
-			while(index > 0 && greater(values[(index - 1) / 2], values[index], indices[(index - 1) / 2 ], indices[index])){
+			while(index > 0 && greater(values[(index - 1) / 2], values[index], 
+						   indices[(index - 1) / 2 ], indices[index])){
+				
 				swap(values[index], values[(index - 1) / 2]);
 				swap(indices[index], indices[(index - 1) /2]);
 				index = (index - 1) / 2;
@@ -88,7 +90,8 @@ struct Heap{
 
 // run heap with top k elem on GPU
 template <typename T>
-__device__ void run_heap(bool sorted, const int k, const int index, const int last_size, const T* in, int32* indices, T* values){
+__device__ void run_heap(bool sorted, const int k, const int index, 
+			 const int last_size, const T* in, int32* indices, T* values){
 	Heap<T> heap;
 	heap.init(k, values, indices);	
 	for(int i = 0; i < last_size; ++i){ heap.add(in[i], i);	}
@@ -105,7 +108,8 @@ __device__ void run_heap(bool sorted, const int k, const int index, const int la
 
 // Define the CUDA kernel.
 template <typename T>
-__global__ void CudaKernel(bool sorted, const int N, const int k, const int last_size, const T* in, int32* indices, T* values) {
+__global__ void CudaKernel(bool sorted, const int N, const int k, 
+			   const int last_size, const T* in, int32* indices, T* values) {
 	for(int i  = blockIdx.x * blockDim.x + threadIdx.x; i < N; i += blockDim.x * gridDim.x){
 		run_heap(sorted, k, i, last_size, &in[i*last_size], &indices[i * k], &values[i * k]);	
 	} 
@@ -124,9 +128,12 @@ void run(bool sorted, const int N, const int k, const int last_size, const T* in
      		 <<<block_count, thread_per_block>>>(sorted, N, k, last_size, in, indices, values);
 }
 
-template void run<int32>(bool sorted, const int N, const int k, const int last_size, const int32* in, int32* indices, int32* values);
-template void run<double>(bool sorted, const int N, const int k, const int last_size, const double* in, int32* indices, double* values);
-template void run<float>(bool sorted, const int N, const int k, const int last_size, const float* in, int32* indices, float* values);
+template void run<int32>(bool sorted, const int N, const int k, 
+			 const int last_size, const int32* in, int32* indices, int32* values);
+template void run<double>(bool sorted, const int N, const int k, 
+			  const int last_size, const double* in, int32* indices, double* values);
+template void run<float>(bool sorted, const int N, const int k, 
+			 const int last_size, const float* in, int32* indices, float* values);
 
 #endif  // GOOGLE_CUDA
 
