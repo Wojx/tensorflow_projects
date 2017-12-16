@@ -1,7 +1,6 @@
 #include "tensorflow/core/framework/op.h"
 #include "tensorflow/core/framework/shape_inference.h"
 #include "tensorflow/core/framework/op_kernel.h"
-#include <iostream>
 
 using namespace tensorflow;
 
@@ -52,14 +51,14 @@ public:
     		Tensor* indices_out = nullptr;
     		OP_REQUIRES_OK(context,
 			context->allocate_output(1, output_shape, &indices_out));
-              /*------------------------------------------------------------------------------------------- */
+
 	        const int input_dims_number = input.dims();
 		const int dim_last_size = input.dim_size(input_dims_number - 1);
         	const int N = input.flat<T>().size() / dim_last_size;
         	const T *input_data = input.flat<T>().data();
         	T *values_data = values_out->flat<T>().data();
         	int32 *indices_data = indices_out->flat<int32>().data();
-              /*----------------------------------------------------------------------------------------------- */
+
     		run<T>(sorted_, N, k, dim_last_size, input_data, 
 			indices_data, values_data);	
 	}
@@ -68,9 +67,6 @@ private:
     int k_;
 };
 // Register the GPU kernels.
-
-                                       
-
     
 REGISTER_KERNEL_BUILDER(                                       
 	Name("MyTopK")
