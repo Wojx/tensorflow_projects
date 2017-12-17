@@ -110,9 +110,12 @@ __device__ void run_heap(bool sorted, const int k, const int index,
 template <typename T>
 __global__ void CudaKernel(bool sorted, const int N, const int k, 
 			   const int last_size, const T* in, int32* indices, T* values) {
-	for(int i  = blockIdx.x * blockDim.x + threadIdx.x; i < N; i += blockDim.x * gridDim.x){
-		run_heap(sorted, k, i, last_size, &in[i*last_size], &indices[i * k], &values[i * k]);	
-	} 
+	int index = blockIdx.x * blockDim.x + threadIdx.x;
+        int stride = blockDim.x * gridDim.x;
+        for(int i  = index; i < N; i += stride){
+                run_heap(sorted, k, i, last_size, &in[i*last_size], &indices[i * k], &values[i * k]);
+        }
+
 }
 
 // Define the GPU implementation that launches the CUDA kernel.
@@ -122,8 +125,8 @@ void run(bool sorted, const int N, const int k, const int last_size, const T* in
   //
   // See core/util/cuda_kernel_helper.h for example of computing
   // block count and thread_per_block count.
-	int block_count = 65535;
 	int thread_per_block = 1024;
+	int block_count = (N + thread_per_block - 1) / thread_per_block;
  	CudaKernel<T>
      		 <<<block_count, thread_per_block>>>(sorted, N, k, last_size, in, indices, values);
 }
