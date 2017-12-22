@@ -37,10 +37,10 @@ struct Heap{
 			n++; 
 		} else{
 			T temp_value = element;
-			int32 temp_indice = index_set;
-			if(greater(temp_value,  get_min(), temp_indice, get_min_indice())){
+			int32 temp_index = index_set;
+			if(greater(temp_value,  get_min(), temp_index, get_min_indice())){
 				values[0] = temp_value;
-				indices[0] = temp_indice;
+				indices[0] = temp_index
 				rebuild_heap(0);	
 			}
 		}	
